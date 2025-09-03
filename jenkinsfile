@@ -9,11 +9,7 @@ pipeline {
     }
 
     stages {
-        stage('Hello world') {
-            steps {
-               
-            }
-        }
+       
 
         stage('Install dependencies') {
             steps {
