@@ -2,61 +2,64 @@ pipeline {
     agent any
 
     environment {
-        ROBOT_RESULTS_DIR = "results"
-        ROBOT_TESTS_DIR   = "tests"
-        REMOTE_CHROME     = "http://selenium_chrome:4444/wd/hub"
-        REMOTE_FIREFOX    = "http://selenium_firefox:4444/wd/hub"
-        VENV_BIN          = "/opt/venv/bin"
+        ROBOT_RESULTS_DIR = 'results'
     }
 
     stages {
-        stage('Install dependencies') {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Wait for Selenium Grid') {
             steps {
                 sh '''
-                ${VENV_BIN}/pip install -U robotframework robotframework-seleniumlibrary
+                echo "Waiting for Selenium Firefox..."
+                until curl -s http://selenium_firefox:4444/status | grep -q '"ready":true'; do
+                  echo "Firefox not ready yet... sleeping 3s"
+                  sleep 3
+                done
+                echo "Firefox ready!"
+
+                echo "Waiting for Selenium Chrome..."
+                until curl -s http://selenium_chrome:4444/status | grep -q '"ready":true'; do
+                  echo "Chrome not ready yet... sleeping 3s"
+                  sleep 3
+                done
+                echo "Chrome ready!"
                 '''
             }
         }
 
-        stage('Run Robot Tests - Chrome') {
+        stage('Run Tests - Chrome') {
             steps {
                 sh '''
-                mkdir -p ${ROBOT_RESULTS_DIR}/chrome
-                ${VENV_BIN}/robot --loglevel TRACE -d ${ROBOT_RESULTS_DIR}/chrome \
-                    --variable REMOTE_URL:${REMOTE_CHROME} \
-                    ${ROBOT_TESTS_DIR}
+                python3 -m robot \
+                  -d ${ROBOT_RESULTS_DIR}/chrome \
+                  --variable REMOTE_URL:http://selenium_chrome:4444/wd/hub \
+                  --variable BROWSER:chrome \
+                  tests/
                 '''
             }
         }
 
-        stage('Run Robot Tests - Firefox') {
+        stage('Run Tests - Firefox') {
             steps {
                 sh '''
-                mkdir -p ${ROBOT_RESULTS_DIR}/firefox
-                ${VENV_BIN}/robot --loglevel TRACE -d ${ROBOT_RESULTS_DIR}/firefox \
-                    --variable REMOTE_URL:${REMOTE_FIREFOX} \
-                    ${ROBOT_TESTS_DIR}
+                python3 -m robot \
+                  -d ${ROBOT_RESULTS_DIR}/firefox \
+                  --variable REMOTE_URL:http://selenium_firefox:4444/wd/hub \
+                  --variable BROWSER:firefox \
+                  tests/
                 '''
-            }
-        }
-
-        stage('Publish Robot Reports') {
-            steps {
-                publishRobotFrameworkReports(
-                    outputPath: "${ROBOT_RESULTS_DIR}/chrome",
-                    outputFileName: "output.xml"
-                )
-                publishRobotFrameworkReports(
-                    outputPath: "${ROBOT_RESULTS_DIR}/firefox",
-                    outputFileName: "output.xml"
-                )
             }
         }
     }
 
     post {
         always {
-            archiveArtifacts artifacts: "${ROBOT_RESULTS_DIR}/**/*", fingerprint: true
+            archiveArtifacts artifacts: '${ROBOT_RESULTS_DIR}/**', fingerprint: true
         }
     }
 }
