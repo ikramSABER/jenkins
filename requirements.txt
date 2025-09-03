@@ -1,6 +1,6 @@
 robotframework
 robotframework-seleniumlibrary
-selenium==4.20.0
+selenium>=4.35.0
 robotframework-requests
 robotframework-databaselibrary
 robotframework-jsonlibrary

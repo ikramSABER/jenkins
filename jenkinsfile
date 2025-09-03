@@ -1,65 +1,23 @@
-pipeline {
-    agent any
-
-    environment {
-        ROBOT_RESULTS_DIR = 'results'
+stage('Run Tests - Chrome') {
+    steps {
+        sh '''
+        /opt/venv/bin/robot \
+          -d results/chrome \
+          --variable REMOTE_URL:http://selenium_chrome:4444/wd/hub \
+          --variable BROWSER:chrome \
+          tests/
+        '''
     }
+}
 
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Wait for Selenium Grid') {
-            steps {
-                sh '''
-                echo "Waiting for Selenium Firefox..."
-                until curl -s http://selenium_firefox:4444/status | grep -q '"ready":true'; do
-                  echo "Firefox not ready yet... sleeping 3s"
-                  sleep 3
-                done
-                echo "Firefox ready!"
-
-                echo "Waiting for Selenium Chrome..."
-                until curl -s http://selenium_chrome:4444/status | grep -q '"ready":true'; do
-                  echo "Chrome not ready yet... sleeping 3s"
-                  sleep 3
-                done
-                echo "Chrome ready!"
-                '''
-            }
-        }
-
-        stage('Run Tests - Chrome') {
-            steps {
-                sh '''
-                python3 -m robot \
-                  -d ${ROBOT_RESULTS_DIR}/chrome \
-                  --variable REMOTE_URL:http://selenium_chrome:4444/wd/hub \
-                  --variable BROWSER:chrome \
-                  tests/
-                '''
-            }
-        }
-
-        stage('Run Tests - Firefox') {
-            steps {
-                sh '''
-                python3 -m robot \
-                  -d ${ROBOT_RESULTS_DIR}/firefox \
-                  --variable REMOTE_URL:http://selenium_firefox:4444/wd/hub \
-                  --variable BROWSER:firefox \
-                  tests/
-                '''
-            }
-        }
-    }
-
-    post {
-        always {
-            archiveArtifacts artifacts: '${ROBOT_RESULTS_DIR}/**', fingerprint: true
-        }
+stage('Run Tests - Firefox') {
+    steps {
+        sh '''
+        /opt/venv/bin/robot \
+          -d results/firefox \
+          --variable REMOTE_URL:http://selenium_firefox:4444/wd/hub \
+          --variable BROWSER:firefox \
+          tests/
+        '''
     }
 }
