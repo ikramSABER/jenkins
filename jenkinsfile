@@ -6,17 +6,14 @@ pipeline {
         ROBOT_TESTS_DIR   = "tests"
         REMOTE_CHROME     = "http://selenium_chrome:4444/wd/hub"
         REMOTE_FIREFOX    = "http://selenium_firefox:4445/wd/hub"
+        VENV_BIN          = "/opt/venv/bin"
     }
 
     stages {
-       
-
         stage('Install dependencies') {
             steps {
                 sh '''
-                # Ensure venv is used
-                source /opt/venv/bin/activate
-                pip install -U robotframework robotframework-seleniumlibrary
+                ${VENV_BIN}/pip install -U robotframework robotframework-seleniumlibrary
                 '''
             }
         }
@@ -24,9 +21,8 @@ pipeline {
         stage('Run Robot Tests - Chrome') {
             steps {
                 sh '''
-                source /opt/venv/bin/activate
-                mkdir -p ${ROBOT_RESULTS_DIR}
-                robot -d ${ROBOT_RESULTS_DIR}/chrome \
+                mkdir -p ${ROBOT_RESULTS_DIR}/chrome
+                ${VENV_BIN}/robot -d ${ROBOT_RESULTS_DIR}/chrome \
                     --variable REMOTE_URL:${REMOTE_CHROME} \
                     ${ROBOT_TESTS_DIR}
                 '''
@@ -36,9 +32,8 @@ pipeline {
         stage('Run Robot Tests - Firefox') {
             steps {
                 sh '''
-                source /opt/venv/bin/activate
-                mkdir -p ${ROBOT_RESULTS_DIR}
-                robot -d ${ROBOT_RESULTS_DIR}/firefox \
+                mkdir -p ${ROBOT_RESULTS_DIR}/firefox
+                ${VENV_BIN}/robot -d ${ROBOT_RESULTS_DIR}/firefox \
                     --variable REMOTE_URL:${REMOTE_FIREFOX} \
                     ${ROBOT_TESTS_DIR}
                 '''
