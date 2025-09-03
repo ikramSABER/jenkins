@@ -1,15 +1,13 @@
-version: '3.8'
+version: "3.9"
 
 services:
   jenkins:
     build: .
-    container_name: ghali-automation
-    user: jenkins
+    container_name: jenkins
     ports:
       - "8080:8080"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - ./workspace:/workspace
     depends_on:
       - selenium_chrome
       - selenium_firefox
@@ -17,16 +15,22 @@ services:
   selenium_chrome:
     image: selenium/standalone-chrome:latest
     container_name: selenium_chrome
+    shm_size: 2g
     ports:
       - "4444:4444"
-    shm_size: 2g
+    environment:
+      - SE_NODE_MAX_SESSIONS=1
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
 
   selenium_firefox:
     image: selenium/standalone-firefox:latest
     container_name: selenium_firefox
+    shm_size: 2g
     ports:
       - "4445:4444"
-    shm_size: 2g
+    environment:
+      - SE_NODE_MAX_SESSIONS=1
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
 
 volumes:
   jenkins_home:

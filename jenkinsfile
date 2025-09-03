@@ -5,7 +5,7 @@ pipeline {
         ROBOT_RESULTS_DIR = "results"
         ROBOT_TESTS_DIR   = "tests"
         REMOTE_CHROME     = "http://selenium_chrome:4444/wd/hub"
-        REMOTE_FIREFOX    = "http://selenium_firefox:4445/wd/hub"
+        REMOTE_FIREFOX    = "http://selenium_firefox:4444/wd/hub"
         VENV_BIN          = "/opt/venv/bin"
     }
 
@@ -22,7 +22,7 @@ pipeline {
             steps {
                 sh '''
                 mkdir -p ${ROBOT_RESULTS_DIR}/chrome
-                ${VENV_BIN}/robot -d ${ROBOT_RESULTS_DIR}/chrome \
+                ${VENV_BIN}/robot --loglevel TRACE -d ${ROBOT_RESULTS_DIR}/chrome \
                     --variable REMOTE_URL:${REMOTE_CHROME} \
                     ${ROBOT_TESTS_DIR}
                 '''
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 sh '''
                 mkdir -p ${ROBOT_RESULTS_DIR}/firefox
-                ${VENV_BIN}/robot -d ${ROBOT_RESULTS_DIR}/firefox \
+                ${VENV_BIN}/robot --loglevel TRACE -d ${ROBOT_RESULTS_DIR}/firefox \
                     --variable REMOTE_URL:${REMOTE_FIREFOX} \
                     ${ROBOT_TESTS_DIR}
                 '''
