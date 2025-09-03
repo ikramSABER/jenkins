@@ -4,6 +4,7 @@ Library    OperatingSystem
 
 *** Variables ***
 ${URL}    https://www.example.com
+${REMOTE_URL}    http://selenium_firefox:4444/wd/hub
 
 *** Test Cases ***
 Open Example Page
