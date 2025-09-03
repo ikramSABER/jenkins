@@ -3,7 +3,7 @@ Library    SeleniumLibrary
 Library    OperatingSystem
 
 *** Variables ***
-${URL}    https://www.google.com
+${URL}    https://www.example.com
 
 *** Test Cases ***
 Open Example Page
