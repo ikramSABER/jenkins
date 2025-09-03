@@ -1,0 +1,37 @@
+# Robot Framework plugin
+robot
+
+# Pipeline and CI/CD plugins
+workflow-aggregator
+pipeline-stage-view
+blueocean
+
+# Git integration
+git
+github
+github-branch-source
+
+# Python integration
+python
+
+# HTML reporting
+htmlpublisher
+
+# Email notifications
+email-ext
+mailer
+
+# Credentials management
+credentials-binding
+
+# Workspace cleanup
+ws-cleanup
+
+# Parameterized builds
+parameterized-trigger
+
+# Timestamper for build logs
+timestamper
+
+# Dashboard view
+dashboard-view

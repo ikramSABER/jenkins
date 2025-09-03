@@ -1,0 +1,9 @@
+robotframework
+robotframework-seleniumlibrary
+selenium==4.20.0
+robotframework-requests
+robotframework-databaselibrary
+robotframework-jsonlibrary
+robotframework-sshlibrary
+pytest
+pylint

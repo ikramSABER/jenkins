@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build: .
+    container_name: ghali-automation
+    user: jenkins
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ./workspace:/workspace
+    depends_on:
+      - selenium_chrome
+      - selenium_firefox
+
+  selenium_chrome:
+    image: selenium/standalone-chrome:latest
+    container_name: selenium_chrome
+    ports:
+      - "4444:4444"
+    shm_size: 2g
+
+  selenium_firefox:
+    image: selenium/standalone-firefox:latest
+    container_name: selenium_firefox
+    ports:
+      - "4445:4444"
+    shm_size: 2g
+
+volumes:
+  jenkins_home:
