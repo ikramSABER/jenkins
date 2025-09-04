@@ -1,12 +1,14 @@
 *** Settings ***
 Library    SeleniumLibrary
+Library    OperatingSystem
 
 *** Variables ***
-${URL}    https://example.com
+${URL}    https://www.example.com
 
 *** Test Cases ***
 Open Example Page
-    Log To Console     \n--- Running test with REMOTE_URL=${REMOTE_URL} and BROWSER=${BROWSER} ---
-    Open Browser    ${URL}    ${BROWSER}    remote_url=${REMOTE_URL}
+    [Documentation]    Open a page in remote Selenium browser
+    Log To Console     \n--- Running test with REMOTE_URL=${REMOTE_URL} ---
+    Open Browser    ${URL}    chrome    remote_url=${REMOTE_URL}
     Title Should Be    Example Domain
-    [Teardown]    Close All Browsers
+    Close Browser

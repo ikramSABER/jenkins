@@ -1,23 +1,75 @@
-stage('Run Tests - Chrome') {
-    steps {
-        sh '''
-        /opt/venv/bin/robot \
-          -d results/chrome \
-          --variable REMOTE_URL:http://selenium_chrome:4444/wd/hub \
-          --variable BROWSER:chrome \
-          tests/
-        '''
-    }
-}
+pipeline {
+    agent any
 
-stage('Run Tests - Firefox') {
-    steps {
-        sh '''
-        /opt/venv/bin/robot \
-          -d results/firefox \
-          --variable REMOTE_URL:http://selenium_firefox:4444/wd/hub \
-          --variable BROWSER:firefox \
-          tests/
-        '''
+    environment {
+        ROBOT_RESULTS_DIR = 'results'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Wait for Selenium Grid') {
+            steps {
+                sh '''
+                echo "Waiting for Selenium Firefox..."
+                for i in {1..20}; do
+                  STATUS=$(curl -s http://selenium_firefox:4444/status || true)
+                  echo "Firefox status: $STATUS"
+                  if echo "$STATUS" | grep -q '"ready":true'; then
+                    echo "Firefox ready!"
+                    break
+                  fi
+                  echo "Firefox not ready yet... sleeping 3s"
+                  sleep 3
+                done
+
+                echo "Waiting for Selenium Chrome..."
+                for i in {1..20}; do
+                  STATUS=$(curl -s http://selenium_chrome:4444/status || true)
+                  echo "Chrome status: $STATUS"
+                  if echo "$STATUS" | grep -q '"ready":true'; then
+                    echo "Chrome ready!"
+                    break
+                  fi
+                  echo "Chrome not ready yet... sleeping 3s"
+                  sleep 3
+                done
+                '''
+            }
+        }
+
+        stage('Run Tests - Chrome') {
+            steps {
+                sh '''
+                python3 -m robot \
+                  -d ${ROBOT_RESULTS_DIR}/chrome \
+                  --variable REMOTE_URL:http://selenium_chrome:4444/wd/hub \
+                  --variable BROWSER:chrome \
+                  tests/
+                '''
+            }
+        }
+
+        stage('Run Tests - Firefox') {
+            steps {
+                sh '''
+                python3 -m robot \
+                  -d ${ROBOT_RESULTS_DIR}/firefox \
+                  --variable REMOTE_URL:http://selenium_firefox:4444/wd/hub \
+                  --variable BROWSER:firefox \
+                  tests/
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '${ROBOT_RESULTS_DIR}/**', fingerprint: true
+        }
     }
 }
