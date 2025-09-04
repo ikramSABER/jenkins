@@ -3,13 +3,13 @@
 
 # Ignore the 'workspace' directory
 workspace/
-tests/
+# tests/
 
 # Ignore a specific file
 docker.zip
 
 # Ignore all files in the 'temp' directory
-tests/*
+# tests/*
 
 # Re-include a specific file within an ignored directory
-!temp/important.txt
+# !temp/important.txt
